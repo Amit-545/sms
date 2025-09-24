@@ -1,0 +1,16 @@
+{
+  "name": "rto-admin-panel",
+  "version": "1.0.0",
+  "description": "RTO Admin Panel for SMS Monitoring",
+  "main": "index.js",
+  "scripts": {
+    "dev": "vercel dev",
+    "deploy": "vercel"
+  },
+  "dependencies": {
+    "mongodb": "^6.0.0"
+  },
+  "devDependencies": {
+    "@vercel/node": "^3.0.0"
+  }
+}
